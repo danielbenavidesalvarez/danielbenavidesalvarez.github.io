@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>D3 Project</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <h1>Slacking on Cleaning</h1>
+    <p class="subtitle">An analysis on my roommate — click a day to inspect what utensils were left dirty. Hover items for drop times.</p>
+  </header>
+
+  <section class="controls">
+    
+    <label for="girlfriendFilter">Girlfriend:</label>
+    <select id="girlfriendFilter"></select>
+    <button id="backToCalendar" style="display:none;">Back to calendar</button>
+    <div id="legend">
+      <span>Less</span>
+      <div class="legend-gradient"></div>
+      <span>More</span>
+    </div>
+  </section>
+
+  <main>
+    <div id="calendar"></div>
+    <div id="detail" style="display:none;"></div>
+  </main>
+
+  <div id="tooltip" class="tooltip" style="opacity:0; position:absolute;"></div>
+
+  <!-- D3 v7 CDN -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <!-- data loader and modular viz scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/calendar.js"></script>
+  <script src="js/detail.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
