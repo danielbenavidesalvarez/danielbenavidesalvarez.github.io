@@ -2,12 +2,17 @@
 (function(){
   // showDayDetail(day) -> renders Morning/Evening/Night totals and attaches click handlers
   function showDayDetail(day, gfFilter='All'){
+    // ensure gfFilter defaults to current select if not provided
+    gfFilter = gfFilter || (d3.select('#girlfriendFilter').node() ? d3.select('#girlfriendFilter').node().value : 'All');
     const helpers = window.roommateHelpers;
     const detail = d3.select('#detail');
     detail.html('');
     detail.style('display', null);
     d3.select('#calendar').style('display','none');
     d3.select('#backToCalendar').style('display',null);
+
+    // store current selection so controls can update the view
+    window._currentSelection = { day, gfFilter };
 
     const periods = helpers.dayByPeriod(day, gfFilter);
 
@@ -51,8 +56,13 @@
   }
 
   function showPeriodBreakdown(day, period, gfFilter='All'){
+    // ensure gfFilter defaults to current select if not provided
+    gfFilter = gfFilter || (d3.select('#girlfriendFilter').node() ? d3.select('#girlfriendFilter').node().value : 'All');
     const helpers = window.roommateHelpers;
     const detail = d3.select('#detail');
+
+    // update current selection
+    window._currentSelection = Object.assign(window._currentSelection || {}, { day, period, gfFilter });
 
     // compute breakdown
     const b = helpers.breakdown(day, period, gfFilter);
