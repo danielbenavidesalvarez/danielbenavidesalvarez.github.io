@@ -9,13 +9,17 @@
 <body>
   <header>
     <h1>Slacking on Cleaning</h1>
-    <p class="subtitle">An analysis on my roommate — click a day to inspect what utensils were left dirty. Hover items for drop times.</p>
+    <p class="subtitle">An analysis on my roommate! Click a day to inspect what utensils were left dirty. Hover items for drop times.</p>
   </header>
 
   <section class="controls">
     
-    <label for="girlfriendFilter">Girlfriend is at home?:</label>
-    <select id="girlfriendFilter"></select>
+    <label for="girlfriendFilter">Who was home?:</label>
+    <div id="girlfriendFilter" class="gf-controls" role="tablist" aria-label="Girlfriend presence filter">
+      <button id="gfNo" class="gf-btn" data-value="No" title="Only my roommate was home">👨</button>
+      <button id="gfYes" class="gf-btn" data-value="Yes" title="Girlfriend is home">👩</button>
+      <button id="gfAll" class="gf-btn active" data-value="All" title="Show all data">👨👩</button>
+    </div>
     <button id="backToCalendar" style="display:none;">Back to calendar</button>
     <div id="legend">
       <span>Less</span>
@@ -33,7 +37,7 @@
 
   <!-- D3 v7 CDN -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
-  <!-- data loader and modular viz scripts -->
+  <!-- data scripts -->
   <script src="js/data.js"></script>
   <script src="js/calendar.js"></script>
   <script src="js/detail.js"></script>

@@ -1,49 +1,59 @@
-// main.js — orchestrates UI after CSV `data/data.csv` is loaded by data.js
+// main.js 
 window._roommate_init = function(){
   const helpers = window.roommateHelpers;
 
-  // populate girlfriend filter
-  const gfSelect = d3.select('#girlfriendFilter');
-  const opts = helpers.girlfriendOptions(); // e.g., ['All','Yes','No']
-  gfSelect.selectAll('option').data(opts).join('option').attr('value', d=>d).text(d=> d === 'All' ? 'Show all data' : d);
+  // girlfriend filter state and handlers
+  window._gfSelection = 'All';
+  window.getGirlfriendFilter = function(){ return window._gfSelection || 'All'; };
 
-  // wire events
-  gfSelect.on('change', ()=>{
-    const val = gfSelect.node().value;
-    // re-render calendar with chosen filter
+  const btnNo = d3.select('#gfNo');
+  const btnYes = d3.select('#gfYes');
+  const btnAll = d3.select('#gfAll');
+
+  function setGF(val){
+    window._gfSelection = val;
+    btnNo.classed('active', val === 'No');
+    btnYes.classed('active', val === 'Yes');
+    btnAll.classed('active', val === 'All');
     if (typeof window.renderCalendar === 'function') window.renderCalendar(val);
-  });
-
-  // also update any open detail view when the filter changes
-  gfSelect.on('change.detailUpdate', ()=>{
-    const val = gfSelect.node().value;
     const cur = window._currentSelection || {};
     if (cur.day) {
-      // if a period is selected, re-render that breakdown; otherwise re-render the day view
       if (cur.period && typeof window.showPeriodBreakdown === 'function') {
         window.showPeriodBreakdown(cur.day, cur.period, val);
       } else if (typeof window.showDayDetail === 'function') {
         window.showDayDetail(cur.day, val);
       }
     }
-  });
+  }
+
+  btnNo.on('click', ()=> setGF('No'));
+  btnYes.on('click', ()=> setGF('Yes'));
+  btnAll.on('click', ()=> setGF('All'));
 
   d3.select('#backToCalendar').on('click', ()=>{
-    d3.select('#detail').style('display','none');
-    d3.select('#calendar').style('display',null);
-    d3.select('#backToCalendar').style('display','none');
+    const calendar = d3.select('#calendar');
+    calendar.style('display', null);
+    const g = calendar.select('svg .calendar-g');
+    if (!g.empty()) {
+      g.transition().duration(700).ease(d3.easeCubicOut).attrTween('transform', function(){
+        const start = d3.select(this).attr('transform') || '';
+        const interp = d3.interpolateString(start, 'translate(0,0) scale(1)');
+        return function(t){ return interp(t); };
+      }).on('end', ()=>{
+        d3.select('#detail').style('display','none');
+        d3.select('#backToCalendar').style('display','none');
+      });
+    } else {
+      d3.select('#detail').style('display','none');
+      d3.select('#backToCalendar').style('display','none');
+    }
   });
 
-  // initial render: use current gf selection (default All)
-  const initialGF = gfSelect.node().value || 'All';
-  if (typeof window.renderCalendar === 'function') window.renderCalendar(initialGF);
+  // Default
+  if (typeof window.renderCalendar === 'function') window.renderCalendar(window.getGirlfriendFilter());
 
-  // responsive: re-render on resize to adjust SVG sizes
-  window.addEventListener('resize', ()=>{ if (typeof window.renderCalendar === 'function') window.renderCalendar(d3.select('#girlfriendFilter').node().value); });
+  // Re render done by the LLM
+  window.addEventListener('resize', ()=>{ if (typeof window.renderCalendar === 'function') window.renderCalendar(window.getGirlfriendFilter()); });
 };
 
-// If data already loaded before this script ran, initialize immediately
-if (window.roommateHelpers && typeof window._roommate_init === 'function'){
-  window._roommate_init();
-}
 

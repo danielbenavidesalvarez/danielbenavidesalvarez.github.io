@@ -1,12 +1,11 @@
-// data.js — loads and parses CSV into a usable structure and exposes helpers
+// data.js
 (function(){
-  // parse numeric fields and normalize
   function parseRow(d){
     return {
       Day: +d.Day,
       Day_of_Week: d.Day_of_Week,
       Time: d.Time,
-      Period: d.Period, // Morning/Evening/Night
+      Period: d.Period, 
       Plates: +d.Plates,
       Cups: +d.Cups,
       Utensils: +d.Utensils,
@@ -17,21 +16,17 @@
   }
 
   d3.csv('data/data.csv', parseRow).then(rows => {
-    // store globally
     window.roommateData = rows;
 
-    // helper indices
     window.roommateHelpers = {
-      // get total items for a given day and optional girlfriend filter ('All','Yes','No')
       dayTotal(day, gfFilter='All'){
         return d3.sum(rows.filter(r=>r.Day===day && (gfFilter==='All' || r.Girlfriend===gfFilter)), r=>r.Total_Items);
       },
-      // get totals by period for a day
+
       dayByPeriod(day, gfFilter='All'){
         const periods = ['Morning','Evening','Night'];
         return periods.map(p=>({period:p, total: d3.sum(rows.filter(r=>r.Day===day && r.Period===p && (gfFilter==='All' || r.Girlfriend===gfFilter)), r=>r.Total_Items)}));
       },
-      // get breakdown for day+period of Plates, Cups, Utensils (sums)
       breakdown(day, period, gfFilter='All'){
         const subset = rows.filter(r=>r.Day===day && r.Period===period && (gfFilter==='All' || r.Girlfriend===gfFilter));
         return {
@@ -40,8 +35,6 @@
           Utensils: d3.sum(subset, d=>d.Utensils)
         };
       },
-      // get array of times for each individual item instance by type
-      // returns { Plates: [time,...], Cups: [...], Utensils: [...] }
       itemsByType(day, period, gfFilter='All'){
         const subset = rows.filter(r=>r.Day===day && r.Period===period && (gfFilter==='All' || r.Girlfriend===gfFilter));
         const plates = [], cups = [], utensils = [];
@@ -52,14 +45,12 @@
         });
         return { Plates: plates, Cups: cups, Utensils: utensils };
       },
-      // get unique girlfriend values present
       girlfriendOptions(){
         const set = new Set(rows.map(r=>r.Girlfriend));
         return ['All', ...Array.from(set)];
       }
     };
 
-    // call init if present
     if (typeof window._roommate_init === 'function') window._roommate_init();
   }).catch(err => {
     console.error('Failed to load roommate CSV', err);
